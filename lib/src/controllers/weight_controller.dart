@@ -51,9 +51,15 @@ class WeightController extends GetxController {
     String formattedDate = DateFormat('yyyy-MM-dd').format(date);
 
     // Find weight by matching date (ignoring time)
-    return allWeights.firstWhere(
+    return allWeights.firstWhereOrNull(
       (weight) => weight.date.split(' ')[0] == formattedDate,
     );
+  }
+
+  // deletd all weights
+  Future<void> deleteAllWeights() async {
+    await DatabaseService().deleteAll();
+    loadWeights();
   }
 
   void setReminderTime(TimeOfDay time) {

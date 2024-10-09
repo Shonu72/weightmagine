@@ -85,7 +85,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     TimeOfDay? pickedTime = await showTimePicker(
                       context: context,
                       initialTime: initialTime,
-                      helpText: "Select Notification Reminder Time:",
+                      helpText: AppStringConstant.selectReminderText,
                       builder: (context, child) {
                         return Theme(
                           data: isDarkMode

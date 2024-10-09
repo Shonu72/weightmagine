@@ -7,4 +7,9 @@ class AppStringConstant {
   static const String pickTimeText = "Pick Time:";
   static const String welcomeText = "Welcome to WeightMagine 👋";
   static const String weightAddWarning = "weight can't be empty";
+  static const String progressText = "Your progress on weight";
+  static const String selectReminderText = "Select Notification Reminder Time:";
+  static const String recordDeleteText = "Weight record deleted.";
+  static const String recordedWeight = "Recorded weight: ";
+  static const String recordedWeightUpdateText = "Weight added/updated successfully";
 }

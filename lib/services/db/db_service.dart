@@ -48,4 +48,10 @@ class DatabaseService extends GetxService {
     final db = await database;
     return await db!.delete('weights', where: 'id = ?', whereArgs: [id]);
   }
+
+  // delete all
+  Future<int> deleteAll() async {
+    final db = await database;
+    return await db!.delete('weights');
+  }
 }

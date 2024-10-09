@@ -33,4 +33,9 @@ class Helpers {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('username');
   }
+
+  static Future<void> removeUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('username');
+  }
 }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import 'package:weightmagine/core/theme/colors.dart';
 import 'package:weightmagine/core/theme/themes.dart';
 import 'package:weightmagine/core/utils/constants/app_string_constant.dart';
 import 'package:weightmagine/core/utils/helpers.dart';
+import 'package:weightmagine/services/routes/route_path.dart';
 import 'package:weightmagine/src/controllers/weight_controller.dart';
 import 'package:weightmagine/src/models/weight_model.dart';
 import 'package:weightmagine/src/views/widgets/custom_button.dart';
@@ -31,7 +33,7 @@ class HomePage extends StatelessWidget {
                     .textTheme
                     .headlineMedium
                     ?.copyWith(fontWeight: FontWeight.w600)),
-            Text("Your progress on weight",
+            Text(AppStringConstant.progressText,
                 style: Theme.of(context)
                     .textTheme
                     .headlineSmall
@@ -42,6 +44,9 @@ class HomePage extends StatelessWidget {
           IconButton(
               onPressed: () {
                 Helpers.saveUser(key: "haveFilledName", value: false);
+                controller.deleteAllWeights();
+                Helpers.removeUsername();
+                context.go(RoutePaths.onboarding);
               },
               icon: const Icon(Icons.logout)),
           IconButton(
@@ -53,7 +58,7 @@ class HomePage extends StatelessWidget {
               TimeOfDay? pickedTime = await showTimePicker(
                 context: context,
                 initialTime: initialTime,
-                helpText: "Select Notification Reminder Time:",
+                helpText: AppStringConstant.selectReminderText,
                 builder: (context, child) {
                   return Theme(
                     data: isDarkMode
@@ -116,7 +121,7 @@ class HomePage extends StatelessWidget {
                       onDismissed: (direction) async {
                         await controller.deleteWeight(weight.id);
 
-                        Helpers.toast('Weight record deleted.');
+                        Helpers.toast(AppStringConstant.recordDeleteText);
                         controller.weights.remove(weight);
                       },
                       child: ListTile(
@@ -135,7 +140,7 @@ class HomePage extends StatelessWidget {
                         ),
                         title: RichText(
                           text: TextSpan(
-                            text: 'Recorded weight: ',
+                            text: AppStringConstant.recordedWeight,
                             style: Theme.of(context).textTheme.displayMedium,
                             children: [
                               TextSpan(
@@ -193,7 +198,7 @@ class HomePage extends StatelessWidget {
                                 color: Theme.of(context).brightness ==
                                         Brightness.dark
                                     ? AppColors.white
-                                    : AppColors.black, // Dynamic title color
+                                    : AppColors.black,
                               ),
                         ),
                       ],
@@ -260,7 +265,7 @@ class HomePage extends StatelessWidget {
                                 );
                                 controller.addOrUpdateWeight(weightModel);
                                 Helpers.toast(
-                                    "Weight added/updated successfully");
+                                    AppStringConstant.recordedWeightUpdateText);
                                 await Future.delayed(
                                     const Duration(seconds: 1));
 
