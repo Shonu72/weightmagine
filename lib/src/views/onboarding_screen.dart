@@ -135,10 +135,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   final weight = double.parse(weightController.text);
                   final weightModel = WeightModel(
                       id: 0, date: DateTime.now().toString(), weight: weight);
-
-                  controller.addWeight(weightModel);
+                  controller.addOrUpdateWeight(weightModel);
                   controller.setReminderTime(selectedTime);
                   Helpers.saveUser(key: "haveFilledName", value: true);
+                  Helpers.saveUsername(nameController.text);
 
                   context.goNamed(RouteNames.home);
                 } else {

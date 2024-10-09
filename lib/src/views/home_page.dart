@@ -7,6 +7,7 @@ import 'package:weightmagine/core/theme/themes.dart';
 import 'package:weightmagine/core/utils/constants/app_string_constant.dart';
 import 'package:weightmagine/core/utils/helpers.dart';
 import 'package:weightmagine/src/controllers/weight_controller.dart';
+import 'package:weightmagine/src/models/weight_model.dart';
 import 'package:weightmagine/src/views/widgets/custom_button.dart';
 import 'package:weightmagine/src/views/widgets/custom_textfield.dart';
 
@@ -16,7 +17,8 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextEditingController weightController = TextEditingController();
-    final controller = Get.find<WeightController>();
+    final WeightController controller = Get.find<WeightController>();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
@@ -24,7 +26,7 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Hey there 👋',
+            Text('Hey ${controller.userName.value} 👋',
                 style: Theme.of(context)
                     .textTheme
                     .headlineMedium
@@ -86,11 +88,14 @@ class HomePage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          const Divider(thickness: 0.4),
+          const Divider(color: Colors.transparent),
           Expanded(
             child: Obx(
               () {
-                return ListView.builder(
+                return ListView.separated(
+                  separatorBuilder: (context, index) => const Divider(
+                    color: Colors.transparent,
+                  ),
                   itemCount: controller.weights.length,
                   itemBuilder: (context, index) {
                     final weight = controller.weights[index];
@@ -99,27 +104,55 @@ class HomePage extends StatelessWidget {
                         DateFormat('dd:MM:yyyy').format(parsedDate);
                     final formattedTime =
                         DateFormat('hh:mm a').format(parsedDate);
-                    return ListTile(
-                      leading: const Icon(Icons.calendar_today),
-                      title: RichText(
-                        text: TextSpan(
-                          text: 'Recorded weight: ',
-                          style: Theme.of(context).textTheme.displayMedium,
-                          children: [
-                            TextSpan(
-                              text: '${weight.weight} kg',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .displayMedium
-                                  ?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16.sp),
-                            ),
-                          ],
-                        ),
+                    return Dismissible(
+                      key: Key(weight.id.toString()),
+                      background: Container(
+                        color: Colors.red,
+                        alignment: Alignment.centerLeft,
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: const Icon(Icons.delete, color: Colors.white),
                       ),
-                      subtitle: Text('On $formattedDate at $formattedTime',
-                          style: Theme.of(context).textTheme.displaySmall),
+                      direction: DismissDirection.startToEnd,
+                      onDismissed: (direction) async {
+                        await controller.deleteWeight(weight.id);
+
+                        Helpers.toast('Weight record deleted.');
+                        controller.weights.remove(weight);
+                      },
+                      child: ListTile(
+                        leading: const Icon(Icons.calendar_today),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(
+                            width: 0.2,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? AppColors.white
+                                    : AppColors.black,
+                          ),
+                        ),
+                        title: RichText(
+                          text: TextSpan(
+                            text: 'Recorded weight: ',
+                            style: Theme.of(context).textTheme.displayMedium,
+                            children: [
+                              TextSpan(
+                                text: '${weight.weight} kg',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displayMedium
+                                    ?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16.sp),
+                              ),
+                            ],
+                          ),
+                        ),
+                        subtitle: Text('On $formattedDate at $formattedTime',
+                            style: Theme.of(context).textTheme.displaySmall),
+                      ),
                     );
                   },
                 );
@@ -188,6 +221,14 @@ class HomePage extends StatelessWidget {
                             name: "Add",
                             onTap: () async {
                               if (weightController.text.isNotEmpty) {
+                                final weight =
+                                    double.parse(weightController.text);
+
+                                final weightModel = WeightModel(
+                                    id: DateTime.now().millisecondsSinceEpoch,
+                                    date: DateTime.now().toString(),
+                                    weight: weight);
+
                                 showDialog(
                                   context: context,
                                   barrierDismissible: false,
@@ -217,9 +258,11 @@ class HomePage extends StatelessWidget {
                                     ),
                                   ),
                                 );
-
+                                controller.addOrUpdateWeight(weightModel);
+                                Helpers.toast(
+                                    "Weight added/updated successfully");
                                 await Future.delayed(
-                                    const Duration(seconds: 2));
+                                    const Duration(seconds: 1));
 
                                 Navigator.pop(context);
                                 Navigator.pop(context);

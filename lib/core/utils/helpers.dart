@@ -23,4 +23,14 @@ class Helpers {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getBool(key);
   }
+
+  static Future<void> saveUsername(String username) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('username', username);
+  }
+
+  static Future<String?> getUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('username');
+  }
 }
