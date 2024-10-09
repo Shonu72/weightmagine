@@ -194,6 +194,7 @@ class HomePage extends StatelessWidget {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 10, right: 10),
         child: FloatingActionButton(
+          backgroundColor: AppColors.primaryColor,
           onPressed: () {
             // Add weights
             showDialog(
