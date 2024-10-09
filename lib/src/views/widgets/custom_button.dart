@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 import 'package:weightmagine/core/theme/colors.dart';
 
 class CustomButton extends StatelessWidget {
@@ -45,7 +44,9 @@ class CustomButton extends StatelessWidget {
               bottom: bottom ?? 0,
               right: right ?? 0),
           decoration: BoxDecoration(
-            color: outlineBtn ? Colors.transparent : color ?? AppColors.primaryColor,
+            color: outlineBtn
+                ? Colors.transparent
+                : color ?? AppColors.primaryColor,
             border: Border.all(
               color: borderColor ?? Colors.transparent,
               width: 1.0,

@@ -83,11 +83,11 @@ class HomePage extends StatelessWidget {
                   leading: const Icon(Icons.calendar_today),
                   title: RichText(
                     text: TextSpan(
-                      text: 'Recorded weight: ', // Regular text
+                      text: 'Recorded weight: ',
                       style: Theme.of(context).textTheme.displayMedium,
                       children: [
                         TextSpan(
-                          text: '$weight kg', // Bold weight text
+                          text: '$weight kg',
                           style: Theme.of(context)
                               .textTheme
                               .displayMedium
