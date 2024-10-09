@@ -35,7 +35,7 @@ class AppTheme {
       displayMedium: TextStyle(
         fontFamily: 'Satoshi',
         fontSize: 18.sp,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w400,
         color: AppColors.black,
       ),
       displaySmall: TextStyle(
@@ -115,7 +115,7 @@ class AppTheme {
     fontFamily: 'Satoshi',
     appBarTheme: AppBarTheme(
       elevation: 0.5,
-      backgroundColor: AppColors.blueDark,
+      backgroundColor: AppColors.black,
       iconTheme: IconThemeData(color: AppColors.white, size: 3.5.h),
       titleTextStyle: TextStyle(
         fontFamily: 'Satoshi',
