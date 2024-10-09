@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:weightmagine/services/notification/notification_service.dart';
 import 'package:weightmagine/src/controllers/weight_controller.dart';
 
 class DependencyInjection {
@@ -8,5 +9,6 @@ class DependencyInjection {
 
   static void _injectController() {
     Get.lazyPut(() => WeightController());
+    Get.lazyPut(() => NotificationService());
   }
 }

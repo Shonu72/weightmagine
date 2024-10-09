@@ -1,20 +1,20 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:weightmagine/core/utils/helpers.dart';
 import 'package:weightmagine/services/db/db_service.dart';
+import 'package:weightmagine/services/notification/notification_service.dart';
 import 'package:weightmagine/src/models/weight_model.dart';
 
 class WeightController extends GetxController {
   var weights = <WeightModel>[].obs;
-  var selectedTime = TimeOfDay.now().obs;
+  var selectedTime = DateTime.now().obs;
   RxString userName = ''.obs;
 
   @override
   void onInit() {
+    super.onInit();
     loadUsername();
     loadWeights();
-    super.onInit();
   }
 
   Future<void> loadUsername() async {
@@ -56,17 +56,25 @@ class WeightController extends GetxController {
     );
   }
 
-  // deletd all weights
+  // Delete all weights
   Future<void> deleteAllWeights() async {
     await DatabaseService().deleteAll();
     loadWeights();
   }
 
-  void setReminderTime(TimeOfDay time) {
-    selectedTime.value = time;
+  void scheduleWeightReminderNotification(DateTime dateTime) {
+    String title = "Weight Reminder";
+    String body = "Time to record your weight.";
+    NotificationService().scheduleNotification(
+      dateTime,
+      title,
+      body,
+    );
   }
 
-  TimeOfDay getReminderTime() {
-    return selectedTime.value;
+  void updateScheduledNotification(DateTime newDateTime) {
+    String title = "Updated Weight Reminder";
+    String body = "Time to record your weight.";
+    NotificationService().updateNotificationSchedule(newDateTime, title, body);
   }
 }

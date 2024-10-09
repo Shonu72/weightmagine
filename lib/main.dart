@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:timezone/data/latest.dart' as tz;
 import 'package:weightmagine/DI/injection.dart';
 import 'package:weightmagine/core/theme/themes.dart';
 import 'package:weightmagine/core/utils/constants/app_string_constant.dart';
+import 'package:weightmagine/services/notification/notification_service.dart';
 import 'package:weightmagine/services/routes/routes.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   DependencyInjection.inject();
+  await NotificationService().init(); // Wait for init to complete
+  tz.initializeTimeZones();
+
+  // Schedule daily notification after init is complete
+  // NotificationService()
+  //     .scheduleDailyNotification(const TimeOfDay(hour: 01, minute: 51));
+
   runApp(const MyApp());
 }
 

@@ -7,6 +7,7 @@ import 'package:weightmagine/core/theme/colors.dart';
 import 'package:weightmagine/core/theme/themes.dart';
 import 'package:weightmagine/core/utils/constants/app_string_constant.dart';
 import 'package:weightmagine/core/utils/helpers.dart';
+import 'package:weightmagine/services/notification/notification_service.dart';
 import 'package:weightmagine/services/routes/route_path.dart';
 import 'package:weightmagine/src/controllers/weight_controller.dart';
 import 'package:weightmagine/src/models/weight_model.dart';
@@ -20,6 +21,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     TextEditingController weightController = TextEditingController();
     final WeightController controller = Get.find<WeightController>();
+    final notificationService = Get.find<NotificationService>();
 
     return Scaffold(
       appBar: AppBar(
@@ -28,11 +30,15 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Hey ${controller.userName.value} 👋',
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium
-                    ?.copyWith(fontWeight: FontWeight.w600)),
+            Obx(
+              () {
+                return Text('Hey ${controller.userName.value} 👋',
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineMedium
+                        ?.copyWith(fontWeight: FontWeight.w600));
+              },
+            ),
             Text(AppStringConstant.progressText,
                 style: Theme.of(context)
                     .textTheme
@@ -52,37 +58,56 @@ class HomePage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () async {
-              TimeOfDay initialTime = TimeOfDay.now();
-              final isDarkMode =
-                  Theme.of(context).brightness == Brightness.dark;
-              TimeOfDay? pickedTime = await showTimePicker(
+              DateTime initialDateTime = DateTime.now();
+              DateTime? pickedDateTime = await showDatePicker(
                 context: context,
-                initialTime: initialTime,
-                helpText: AppStringConstant.selectReminderText,
-                builder: (context, child) {
-                  return Theme(
-                    data: isDarkMode
-                        ? AppTheme.darkTheme.copyWith(
-                            textTheme: const TextTheme(
-                              displayMedium: TextStyle(fontSize: 36),
-                            ),
-                          )
-                        : AppTheme.lightTheme.copyWith(
-                            textTheme: const TextTheme(
-                            displayMedium: TextStyle(fontSize: 36),
-                          )),
-                    child: MediaQuery(
-                      data: MediaQuery.of(context)
-                          .copyWith(alwaysUse24HourFormat: false),
-                      child: child!,
-                    ),
-                  );
-                },
+                initialDate: initialDateTime,
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2101),
               );
 
-              if (pickedTime != null) {
-                // Will update time in the database here and show toast
-                print('Selected Time: ${pickedTime.format(context)}');
+              if (pickedDateTime != null) {
+                // Show time picker after selecting the date
+                TimeOfDay initialTime = TimeOfDay.now();
+                final isDarkMode =
+                    Theme.of(context).brightness == Brightness.dark;
+                TimeOfDay? pickedTime = await showTimePicker(
+                  context: context,
+                  initialTime: initialTime,
+                  helpText: AppStringConstant.selectReminderText,
+                  builder: (context, child) {
+                    return Theme(
+                      data: isDarkMode
+                          ? AppTheme.darkTheme.copyWith(
+                              textTheme: const TextTheme(
+                                displayMedium: TextStyle(fontSize: 36),
+                              ),
+                            )
+                          : AppTheme.lightTheme.copyWith(
+                              textTheme: const TextTheme(
+                              displayMedium: TextStyle(fontSize: 36),
+                            )),
+                      child: MediaQuery(
+                        data: MediaQuery.of(context)
+                            .copyWith(alwaysUse24HourFormat: false),
+                        child: child!,
+                      ),
+                    );
+                  },
+                );
+
+                if (pickedTime != null) {
+                  DateTime selectedDateTime = DateTime(
+                    pickedDateTime.year,
+                    pickedDateTime.month,
+                    pickedDateTime.day,
+                    pickedTime.hour,
+                    pickedTime.minute,
+                  );
+                  print('Selected Date and Time: $selectedDateTime');
+                  controller
+                      .scheduleWeightReminderNotification(selectedDateTime);
+                }
               }
             },
           ),
@@ -273,13 +298,10 @@ class HomePage extends StatelessWidget {
                                 Navigator.pop(context);
                                 weightController.clear();
                               } else {
-                                Helpers.toast(
-                                    AppStringConstant.weightAddWarning);
+                                Helpers.toast(AppStringConstant.enterWeight);
                               }
                             },
-                            height: 50,
-                            textColor: AppColors.textWhiteColor,
-                          ),
+                          )
                         ],
                       ),
                     ),
@@ -288,11 +310,6 @@ class HomePage extends StatelessWidget {
               },
             );
           },
-          backgroundColor: AppColors.primaryColor,
-          elevation: 5,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
           child: Image(
             image: const AssetImage('assets/add.png'),
             height: 3.5.h,

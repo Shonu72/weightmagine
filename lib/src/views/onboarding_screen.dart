@@ -6,6 +6,7 @@ import 'package:weightmagine/core/theme/colors.dart';
 import 'package:weightmagine/core/theme/themes.dart';
 import 'package:weightmagine/core/utils/constants/app_string_constant.dart';
 import 'package:weightmagine/core/utils/helpers.dart';
+import 'package:weightmagine/services/notification/notification_service.dart';
 import 'package:weightmagine/services/routes/route_name.dart';
 import 'package:weightmagine/src/controllers/weight_controller.dart';
 import 'package:weightmagine/src/models/weight_model.dart';
@@ -23,8 +24,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController weightController = TextEditingController();
   final controller = Get.find<WeightController>();
+  final notificationService = Get.find<NotificationService>();
 
-  TimeOfDay selectedTime = TimeOfDay.now();
+  DateTime selectedTime = DateTime.now();
 
   @override
   void dispose() {
@@ -79,12 +81,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 TextButton(
                   onPressed: () async {
-                    TimeOfDay initialTime = TimeOfDay.now();
+                    DateTime initialTime = DateTime.now();
                     final isDarkMode =
                         Theme.of(context).brightness == Brightness.dark;
                     TimeOfDay? pickedTime = await showTimePicker(
                       context: context,
-                      initialTime: initialTime,
+                      initialTime: TimeOfDay.fromDateTime(initialTime),
                       helpText: AppStringConstant.selectReminderText,
                       builder: (context, child) {
                         return Theme(
@@ -107,20 +109,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       },
                     );
 
-                    if (pickedTime != null && pickedTime != initialTime) {
-                      // Will update time in the database here and show toast
+                    if (pickedTime != null) {
+                      // Update selected time to DateTime
                       setState(() {
-                        selectedTime = pickedTime;
+                        selectedTime = DateTime(
+                          selectedTime.year,
+                          selectedTime.month,
+                          selectedTime.day,
+                          pickedTime.hour,
+                          pickedTime.minute,
+                        );
                       });
-                      print('Selected Time: ${pickedTime.format(context)}');
+                      print('Selected Time: ${selectedTime.toLocal()}');
                     }
                   },
                   child: Text(
-                      '${AppStringConstant.pickTimeText} ${selectedTime.format(context)}', // Display chosen time
-                      style: Theme.of(context)
-                          .textTheme
-                          .displaySmall
-                          ?.copyWith(fontSize: 15.sp)),
+                    '${AppStringConstant.pickTimeText} ${TimeOfDay.fromDateTime(selectedTime).format(context)}', // Update to show DateTime
+                    style: Theme.of(context)
+                        .textTheme
+                        .displaySmall
+                        ?.copyWith(fontSize: 15.sp),
+                  ),
                 ),
               ],
             ),
@@ -136,10 +145,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   final weightModel = WeightModel(
                       id: 0, date: DateTime.now().toString(), weight: weight);
                   controller.addOrUpdateWeight(weightModel);
-                  controller.setReminderTime(selectedTime);
                   Helpers.saveUser(key: "haveFilledName", value: true);
                   Helpers.saveUsername(nameController.text);
-
+                  controller.scheduleWeightReminderNotification(selectedTime);
                   context.goNamed(RouteNames.home);
                 } else {
                   Helpers.toast("Please fill required fields");
