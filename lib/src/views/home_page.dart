@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import 'package:weightmagine/core/theme/colors.dart';
 import 'package:weightmagine/core/theme/themes.dart';
 import 'package:weightmagine/core/utils/constants/app_string_constant.dart';
 import 'package:weightmagine/core/utils/helpers.dart';
+import 'package:weightmagine/src/controllers/weight_controller.dart';
 import 'package:weightmagine/src/views/widgets/custom_button.dart';
 import 'package:weightmagine/src/views/widgets/custom_textfield.dart';
 
@@ -13,6 +16,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextEditingController weightController = TextEditingController();
+    final controller = Get.find<WeightController>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
@@ -33,6 +37,11 @@ class HomePage extends StatelessWidget {
           ],
         ),
         actions: [
+          IconButton(
+              onPressed: () {
+                Helpers.saveUser(key: "haveFilledName", value: false);
+              },
+              icon: const Icon(Icons.logout)),
           IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () async {
@@ -79,30 +88,40 @@ class HomePage extends StatelessWidget {
         children: [
           const Divider(thickness: 0.4),
           Expanded(
-            child: ListView.builder(
-              itemCount: 50,
-              itemBuilder: (context, index) {
-                const weight = 50;
-                return ListTile(
-                  leading: const Icon(Icons.calendar_today),
-                  title: RichText(
-                    text: TextSpan(
-                      text: 'Recorded weight: ',
-                      style: Theme.of(context).textTheme.displayMedium,
-                      children: [
-                        TextSpan(
-                          text: '$weight kg',
-                          style: Theme.of(context)
-                              .textTheme
-                              .displayMedium
-                              ?.copyWith(
-                                  fontWeight: FontWeight.w600, fontSize: 16.sp),
+            child: Obx(
+              () {
+                return ListView.builder(
+                  itemCount: controller.weights.length,
+                  itemBuilder: (context, index) {
+                    final weight = controller.weights[index];
+                    final DateTime parsedDate = DateTime.parse(weight.date);
+                    final formattedDate =
+                        DateFormat('dd:MM:yyyy').format(parsedDate);
+                    final formattedTime =
+                        DateFormat('hh:mm a').format(parsedDate);
+                    return ListTile(
+                      leading: const Icon(Icons.calendar_today),
+                      title: RichText(
+                        text: TextSpan(
+                          text: 'Recorded weight: ',
+                          style: Theme.of(context).textTheme.displayMedium,
+                          children: [
+                            TextSpan(
+                              text: '${weight.weight} kg',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .displayMedium
+                                  ?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16.sp),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  subtitle: Text('On 10/12/12 at 12:02 am',
-                      style: Theme.of(context).textTheme.displaySmall),
+                      ),
+                      subtitle: Text('On $formattedDate at $formattedTime',
+                          style: Theme.of(context).textTheme.displaySmall),
+                    );
+                  },
                 );
               },
             ),

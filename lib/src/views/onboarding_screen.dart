@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sizer/sizer.dart';
 import 'package:weightmagine/core/theme/colors.dart';
+import 'package:weightmagine/core/theme/themes.dart';
 import 'package:weightmagine/core/utils/constants/app_string_constant.dart';
 import 'package:weightmagine/core/utils/helpers.dart';
 import 'package:weightmagine/services/routes/route_name.dart';
@@ -78,14 +79,40 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 TextButton(
                   onPressed: () async {
-                    TimeOfDay? picked = await showTimePicker(
+                    TimeOfDay initialTime = TimeOfDay.now();
+                    final isDarkMode =
+                        Theme.of(context).brightness == Brightness.dark;
+                    TimeOfDay? pickedTime = await showTimePicker(
                       context: context,
-                      initialTime: selectedTime,
+                      initialTime: initialTime,
+                      helpText: "Select Notification Reminder Time:",
+                      builder: (context, child) {
+                        return Theme(
+                          data: isDarkMode
+                              ? AppTheme.darkTheme.copyWith(
+                                  textTheme: const TextTheme(
+                                    displayMedium: TextStyle(fontSize: 36),
+                                  ),
+                                )
+                              : AppTheme.lightTheme.copyWith(
+                                  textTheme: const TextTheme(
+                                  displayMedium: TextStyle(fontSize: 36),
+                                )),
+                          child: MediaQuery(
+                            data: MediaQuery.of(context)
+                                .copyWith(alwaysUse24HourFormat: false),
+                            child: child!,
+                          ),
+                        );
+                      },
                     );
-                    if (picked != null && picked != selectedTime) {
+
+                    if (pickedTime != null && pickedTime != initialTime) {
+                      // Will update time in the database here and show toast
                       setState(() {
-                        selectedTime = picked;
+                        selectedTime = pickedTime;
                       });
+                      print('Selected Time: ${pickedTime.format(context)}');
                     }
                   },
                   child: Text(

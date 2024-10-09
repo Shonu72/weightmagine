@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return ResponsiveSizer(
+    return Sizer(
       builder: (context, orientation, deviceType) {
         return MaterialApp.router(
           title: AppStringConstant.appname,
