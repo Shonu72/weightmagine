@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sizer/sizer.dart';
 import 'package:weightmagine/core/theme/colors.dart';
 import 'package:weightmagine/core/utils/constants/app_string_constant.dart';
 import 'package:weightmagine/core/utils/helpers.dart';
 import 'package:weightmagine/services/routes/route_name.dart';
+import 'package:weightmagine/src/controllers/weight_controller.dart';
+import 'package:weightmagine/src/models/weight_model.dart';
 import 'package:weightmagine/src/views/widgets/custom_button.dart';
 import 'package:weightmagine/src/views/widgets/custom_textfield.dart';
 
@@ -18,6 +21,7 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController weightController = TextEditingController();
+  final controller = Get.find<WeightController>();
 
   TimeOfDay selectedTime = TimeOfDay.now();
 
@@ -95,16 +99,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             const SizedBox(height: 20),
             CustomButton(
-                name: "Next",
-                textColor: AppColors.white,
-                onTap: () {
-                  if (nameController.text.isNotEmpty &&
-                      weightController.text.isNotEmpty) {
-                    context.goNamed(RouteNames.home);
-                  } else {
-                    Helpers.toast("Please fill required fields");
-                  }
-                }),
+              name: "Next",
+              textColor: AppColors.white,
+              onTap: () {
+                if (nameController.text.isNotEmpty &&
+                    weightController.text.isNotEmpty) {
+                  // Save name, weight, and notification time
+                  final weight = double.parse(weightController.text);
+                  final weightModel = WeightModel(
+                      id: 0, date: DateTime.now().toString(), weight: weight);
+
+                  controller.addWeight(weightModel);
+                  controller.setReminderTime(selectedTime);
+                  Helpers.saveUser(key: "haveFilledName", value: true);
+
+                  context.goNamed(RouteNames.home);
+                } else {
+                  Helpers.toast("Please fill required fields");
+                }
+              },
+            ),
             SizedBox(height: 12.h),
           ],
         ),

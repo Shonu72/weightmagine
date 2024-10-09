@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:weightmagine/DI/injection.dart';
 import 'package:weightmagine/core/theme/themes.dart';
 import 'package:weightmagine/core/utils/constants/app_string_constant.dart';
 import 'package:weightmagine/services/routes/routes.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  DependencyInjection.inject();
   runApp(const MyApp());
 }
 
