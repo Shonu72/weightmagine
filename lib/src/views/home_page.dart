@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:weightmagine/core/theme/colors.dart';
 import 'package:weightmagine/core/theme/themes.dart';
+import 'package:weightmagine/core/utils/constants/app_string_constant.dart';
+import 'package:weightmagine/core/utils/helpers.dart';
+import 'package:weightmagine/src/views/widgets/custom_button.dart';
+import 'package:weightmagine/src/views/widgets/custom_textfield.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -16,7 +20,7 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Hey HK 👋',
+            Text('Hey there 👋',
                 style: Theme.of(context)
                     .textTheme
                     .headlineMedium
@@ -110,6 +114,112 @@ class HomePage extends StatelessWidget {
         child: FloatingActionButton(
           onPressed: () {
             // Add weights
+            showDialog(
+              context: context,
+              builder: (context) {
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: 140,
+                    maxWidth: MediaQuery.of(context).size.width,
+                  ),
+                  child: AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                    surfaceTintColor: Colors.grey,
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppStringConstant.addWeightText,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayMedium!
+                              .copyWith(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? AppColors.white
+                                    : AppColors.black, // Dynamic title color
+                              ),
+                        ),
+                      ],
+                    ),
+                    content: SizedBox(
+                      height: 140,
+                      child: Column(
+                        children: [
+                          CustomTextField(
+                            controller: weightController,
+                            hintText: AppStringConstant.enterWeight,
+                            prefixIcon: const Icon(Icons.monitor_weight),
+                            obscureText: false,
+                            ontap: () {},
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Enter weight";
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 15),
+                          CustomButton(
+                            name: "Add",
+                            onTap: () async {
+                              if (weightController.text.isNotEmpty) {
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                    surfaceTintColor: Colors.transparent,
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const CircularProgressIndicator(),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          'Updating',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayMedium!
+                                              .copyWith(
+                                                color: Theme.of(context)
+                                                            .brightness ==
+                                                        Brightness.dark
+                                                    ? AppColors.white
+                                                    : AppColors.black,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+
+                                await Future.delayed(
+                                    const Duration(seconds: 2));
+
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                weightController.clear();
+                              } else {
+                                Helpers.toast(
+                                    AppStringConstant.weightAddWarning);
+                              }
+                            },
+                            height: 50,
+                            textColor: AppColors.textWhiteColor,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
           },
           backgroundColor: AppColors.primaryColor,
           elevation: 5,

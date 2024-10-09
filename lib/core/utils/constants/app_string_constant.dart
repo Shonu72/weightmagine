@@ -5,5 +5,6 @@ class AppStringConstant {
   static const String addWeightText = "Add your weight ";
   static const String reminderText = "Set Reminder Time:";
   static const String pickTimeText = "Pick Time:";
-  static const String welcomeText = "Welcome to Weightmagine 👋";
+  static const String welcomeText = "Welcome to WeightMagine 👋";
+  static const String weightAddWarning = "weight can't be empty";
 }

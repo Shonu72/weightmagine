@@ -38,9 +38,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
       onChanged: widget.onChanged,
       onTap: widget.ontap,
       controller: widget.controller,
+      style: Theme.of(context).textTheme.displayMedium,
       validator: widget.validator,
       obscureText: widget.obscureText && !isPasswordVisible,
       keyboardType: widget.keyboardType,
+      cursorHeight: 20,
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(vertical: 20),
         hintText: widget.hintText,
