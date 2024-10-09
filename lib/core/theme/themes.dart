@@ -13,6 +13,7 @@ class AppTheme {
     appBarTheme: AppBarTheme(
       elevation: 0.5,
       backgroundColor: AppColors.backgroundColor,
+      surfaceTintColor: Colors.transparent,
       iconTheme: IconThemeData(color: AppColors.black, size: 3.5.h),
       titleTextStyle: TextStyle(
         fontFamily: 'Satoshi',
@@ -116,6 +117,7 @@ class AppTheme {
     appBarTheme: AppBarTheme(
       elevation: 0.5,
       backgroundColor: AppColors.black,
+      surfaceTintColor: Colors.transparent,
       iconTheme: IconThemeData(color: AppColors.white, size: 3.5.h),
       titleTextStyle: TextStyle(
         fontFamily: 'Satoshi',

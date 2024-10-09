@@ -42,7 +42,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       obscureText: widget.obscureText && !isPasswordVisible,
       keyboardType: widget.keyboardType,
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(vertical: 20), 
+        contentPadding: const EdgeInsets.symmetric(vertical: 20),
         hintText: widget.hintText,
         hintStyle: Theme.of(context).textTheme.displayMedium,
         suffixIcon: widget.obscureText
