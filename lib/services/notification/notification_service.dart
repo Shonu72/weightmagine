@@ -39,7 +39,7 @@ class NotificationService {
   Future<void> scheduleNotification(
       DateTime dateTime, String title, String body) async {
     await _flutterLocalNotificationsPlugin.zonedSchedule(
-      0,
+      10, // id
       title,
       body,
       tz.TZDateTime.from(dateTime, tz.local),
@@ -50,8 +50,7 @@ class NotificationService {
           channelDescription: 'Your channel description',
           importance: Importance.high,
           priority: Priority.high,
-          sound: RawResourceAndroidNotificationSound(
-              'notification_sound'), // Optional sound
+          sound: RawResourceAndroidNotificationSound('notification_sound'),
         ),
         iOS: DarwinNotificationDetails(),
       ),

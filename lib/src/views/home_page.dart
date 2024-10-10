@@ -14,14 +14,20 @@ import 'package:weightmagine/src/models/weight_model.dart';
 import 'package:weightmagine/src/views/widgets/custom_button.dart';
 import 'package:weightmagine/src/views/widgets/custom_textfield.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     TextEditingController weightController = TextEditingController();
     final WeightController controller = Get.find<WeightController>();
     final notificationService = Get.find<NotificationService>();
+    DateTime selectedTime = DateTime.now();
 
     return Scaffold(
       appBar: AppBar(
@@ -58,56 +64,46 @@ class HomePage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () async {
-              DateTime initialDateTime = DateTime.now();
-              DateTime? pickedDateTime = await showDatePicker(
+              DateTime initialTime = DateTime.now();
+              final isDarkMode =
+                  Theme.of(context).brightness == Brightness.dark;
+              TimeOfDay? pickedTime = await showTimePicker(
                 context: context,
-                initialDate: initialDateTime,
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2101),
+                initialTime: TimeOfDay.fromDateTime(initialTime),
+                helpText: AppStringConstant.selectReminderText,
+                builder: (context, child) {
+                  return Theme(
+                    data: isDarkMode
+                        ? AppTheme.darkTheme.copyWith(
+                            textTheme: const TextTheme(
+                              displayMedium: TextStyle(fontSize: 36),
+                            ),
+                          )
+                        : AppTheme.lightTheme.copyWith(
+                            textTheme: const TextTheme(
+                            displayMedium: TextStyle(fontSize: 36),
+                          )),
+                    child: MediaQuery(
+                      data: MediaQuery.of(context)
+                          .copyWith(alwaysUse24HourFormat: false),
+                      child: child!,
+                    ),
+                  );
+                },
               );
 
-              if (pickedDateTime != null) {
-                // Show time picker after selecting the date
-                TimeOfDay initialTime = TimeOfDay.now();
-                final isDarkMode =
-                    Theme.of(context).brightness == Brightness.dark;
-                TimeOfDay? pickedTime = await showTimePicker(
-                  context: context,
-                  initialTime: initialTime,
-                  helpText: AppStringConstant.selectReminderText,
-                  builder: (context, child) {
-                    return Theme(
-                      data: isDarkMode
-                          ? AppTheme.darkTheme.copyWith(
-                              textTheme: const TextTheme(
-                                displayMedium: TextStyle(fontSize: 36),
-                              ),
-                            )
-                          : AppTheme.lightTheme.copyWith(
-                              textTheme: const TextTheme(
-                              displayMedium: TextStyle(fontSize: 36),
-                            )),
-                      child: MediaQuery(
-                        data: MediaQuery.of(context)
-                            .copyWith(alwaysUse24HourFormat: false),
-                        child: child!,
-                      ),
-                    );
-                  },
-                );
-
-                if (pickedTime != null) {
-                  DateTime selectedDateTime = DateTime(
-                    pickedDateTime.year,
-                    pickedDateTime.month,
-                    pickedDateTime.day,
+              if (pickedTime != null) {
+                // Update selected time to DateTime
+                setState(() {
+                  selectedTime = DateTime(
+                    selectedTime.year,
+                    selectedTime.month,
+                    selectedTime.day,
                     pickedTime.hour,
                     pickedTime.minute,
                   );
-                  print('Selected Date and Time: $selectedDateTime');
-                  controller
-                      .scheduleWeightReminderNotification(selectedDateTime);
-                }
+                });
+                print('Selected Time: ${selectedTime.toLocal()}');
               }
             },
           ),

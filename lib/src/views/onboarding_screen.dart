@@ -131,6 +131,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ?.copyWith(fontSize: 15.sp),
                   ),
                 ),
+              
               ],
             ),
             const SizedBox(height: 20),
